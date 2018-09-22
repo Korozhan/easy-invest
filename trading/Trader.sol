@@ -17,7 +17,7 @@ contract Trader is BasicToken, Ownable {
     /**
      * Trader's name
      */
-    string name;
+    string public name;
     
     Fond public fond; 
     
@@ -28,11 +28,24 @@ contract Trader is BasicToken, Ownable {
         name = _name;
     }
 
+    /**
+     * Founds a new fond. Allows to have only one fond at time.
+     */
     function foundFond() public {
         require(
             fond == address(0x0) || !fond.isAlive(), 
             "You can manage only one fond at time");
         fond = new Fond();
+    }
+
+    /**
+     * Invites another trader to fond. 
+     */
+    function inviteToFond(address _trader) public onlyOwner {
+        require(
+            fond != address(0x0) && fond.isAlive(), 
+            "Fond doesn't exists");
+        fond.addTrader(_trader);
     }
     
 }
