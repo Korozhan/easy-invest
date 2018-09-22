@@ -6,7 +6,7 @@ import "./Trader.sol";
 
 contract Fond is BasicToken, Ownable {
     
-    uint64 public constant TRANDING_PERIOD = 1000000;
+    uint256 public constant TRANDING_PERIOD = 1000000;
     
     uint8 public tradersCount;
     
