@@ -6,10 +6,9 @@ import "./Trader.sol";
 
 contract Fond is BasicToken, Ownable {
     
-    uint64 public constant TRANDING_PERIOD = 1000000;
-
+    uint256 public constant TRANDING_PERIOD = 1000000;
     uint8 public tradersCount;
-
+    
     uint256 startTime;
     mapping(address => bool) traders;
     
@@ -27,18 +26,18 @@ contract Fond is BasicToken, Ownable {
         traders[_trader] = true;
         tradersCount++;
     }
-
+    
     /**
      * Starts tranding. Stop acceptance of new funds from investors.
      * Traders cannot be added until tranding is stopped.
      */
     function startTrading() {
         require(
-            !isRunning(),
+            !isRunning(), 
             "Fond already is running");
         startTime = now;
     }
-
+    
     /**
      * Checks if fond is still alive, i.e. 
      * number of active trades is not zero
@@ -60,5 +59,5 @@ contract Fond is BasicToken, Ownable {
                 "Such trader doesn't exist");
         return Trader(_trader).name();
     }
-    
+
 }
