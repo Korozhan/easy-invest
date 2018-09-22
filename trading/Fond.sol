@@ -1,12 +1,20 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.15;
 
-contract Fond is Ownable{
+import "./tokens/Ownable.sol";
+import "./tokens/BasicToken.sol";
+import "./Trader.sol";
 
-    Trader[] public traders;
+contract Fond is BasicToken, Ownable {
 
-    mapping(address => uint256) public traderId;
+    constructor() {
+    }
 
-    function Fond(){
+    function addTrader(Trader _trader) public {
 
     }
+
+    function isAlive() public returns (bool) {
+        return true;
+    }
+
 }
