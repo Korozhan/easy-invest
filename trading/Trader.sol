@@ -33,7 +33,7 @@ contract Trader is BasicToken, Ownable {
      */
     function foundFond() public {
         require(
-            fond == address(0x0) || !fond.isAlive(), 
+            fond == address(0x0) || !fond.isAlive(),
             "You can manage only one fond at time");
         fond = new Fond();
     }
@@ -46,6 +46,13 @@ contract Trader is BasicToken, Ownable {
             fond != address(0x0) && fond.isAlive(), 
             "Fond doesn't exists");
         fond.addTrader(_trader);
+    }
+    
+    function startTrading() {
+        require(
+            fond != address(0x0) && fond.isAlive(),
+            "Fond should be active to start trading");
+        fond.startTrading();
     }
     
 }
