@@ -12,7 +12,14 @@ contract Fond is BasicToken, Ownable {
     uint256 startTime;
     mapping(address => bool) traders;
     
-    constructor() {
+    struct Quote {
+        string symbol;
+        uint256 price;
+    }
+    
+    constructor(string _symbol, uint256 price) {
+        require(_symbol != '', "Symbol is required");
+        require(_price > 0, 'Price is required');
         addTrader(msg.sender);
     }
     
