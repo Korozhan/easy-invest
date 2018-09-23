@@ -3,6 +3,10 @@ pragma solidity ^0.4.0;
 import "../common/SafeMath.sol";
 import "./MintableToken.sol";
 
+/**
+ * Global smart contract that release a new tokens
+ * and keep token balans for actors in the system.
+ */
 contract InvestToken is MintableToken {
 
     using SafeMath for uint256;
@@ -20,9 +24,8 @@ contract InvestToken is MintableToken {
     // address where funds are collected
     address public wallet;
 
-    function InvestToken() public {
+    constructor() public {
     }
-
 
     function invest(address _to, uint256 _value) public returns (bool) {
         if (investors[msg.sender] != 0) {
@@ -34,6 +37,4 @@ contract InvestToken is MintableToken {
         }
         return true;
     }
-
-
 }

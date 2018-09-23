@@ -2,6 +2,7 @@ pragma solidity ^0.4.15;
 
 import "./tokens/Ownable.sol";
 import "./tokens/BasicToken.sol";
+import "./tokens/InvestToken.sol";
 import "./Trader.sol";
 
 /**
@@ -10,7 +11,7 @@ import "./Trader.sol";
  * that trader undertakes to buy.
  * 
  */
-contract Fond is BasicToken, Ownable {
+contract Fond is Ownable {
 
     using SafeMath for uint256;
 
@@ -27,32 +28,24 @@ contract Fond is BasicToken, Ownable {
      * Time period for trading. During that period
      * fond blocks any fund operations.
      */
-    uint256 public constant TRADING_PERIOD = 1000000;
-    /**
-     * Number of traders in fond
-     */
-    uint8 public tradersCount;
-    
+    uint256 constant DURATION = 1000000;
     /**
      * Time when fond started trading.
      */
-    uint256 startTime;
-    
+    uint256 start;
     /**
      * Total tokens already fund rised.
      */
     uint256 public fundRisedTokensAmount;
-    
     /**
-     * Total quotes count to buy
+     * Total bought quotes count.
      */
-    uint256 public desiredQuotesCount;
-    
+    uint256 public totalQuotesCount;
     /**
      * Mapping of traders, used to check if such trader is already in fond. 
      */
-    mapping(address => bool) traders;
-    
+    mapping(address => bool) tradersMapping;
+    Trader[] traders;
     /**
      * Mapping to check if such quote symbol already present in portfolio.
      */
@@ -60,9 +53,32 @@ contract Fond is BasicToken, Ownable {
     /**
      * Mapping of quote symbol to quote parameters, used for trading.
      */
-    mapping(string => Quote) quotes;
+    mapping(string => Quote) quotesMapping;
     
-    constructor() {
+    /**
+     * Quotes to be interate thru.
+     */
+    Quote[] quotes;
+    
+    /**
+     * Mapping quote to amount.
+     */
+    mapping(string => uint256) quoteAmountMapping;
+    
+    /**
+     * Controls tokens emission. Allow transfering
+     * and distributing tokens accross traders.
+     */
+    InvestToken investToken;
+    
+    event StartTrading();
+    event StopTrading();
+    
+    constructor(address _investToken) {
+        require(
+            _investToken != address(0),
+            "Invest token address is required");
+        investToken = InvestToken(_investToken);
         addTrader(msg.sender);
     }
     
@@ -74,17 +90,18 @@ contract Fond is BasicToken, Ownable {
             bytes(_symbol).length != 0, 
             "Symbol is required");
         require(
-            _percent > 0, 
+            _percent > 0,
             "Quote percent part should be greater");
         require(
             !quotesPortfolion[_symbol], 
             "Such quote already in portfolio");
         quotesPortfolion[_symbol] = true;
-        quotes[_symbol] = Quote({
+        Quote memory quote = Quote({
             symbol: _symbol,
             percent: _percent,
-            price: 0
-        });
+            price: 1/*should be oraclized*/});
+        quotes.push(quote);
+        quotesMapping[_symbol] = quote;
     }
     
     function addTrader(address _trader) onlyOwner public {
@@ -92,22 +109,57 @@ contract Fond is BasicToken, Ownable {
             !isRunning(),
             "You cannot add traders while fond is running");
         require(
-            !traders[_trader],
+            !tradersMapping[_trader],
             "Such traders already in fond");
-        traders[_trader] = true;
-        tradersCount++;
+        tradersMapping[_trader] = true;
+        traders.push(Trader(_trader));
     }
     
     /**
      * Starts tranding. Stop acceptance of new funds from investors.
      * Traders cannot be added until tranding is stopped.
      */
-    function startTrading() {
+    function startTrading() onlyOwner public {
         require(
-            !isRunning(), 
+            !isRunning(),
             "Fond already is running");
-        startTime = now;
+        start = now; // start tranding
         
+        fundRisedTokensAmount = investToken.balanceOf(this);
+        uint256 tokensPerPercent = fundRisedTokensAmount.div(100);
+        for (uint i = 0; i < quotes.length; ++i) {
+            uint256 quoteFund = tokensPerPercent.mul(quotes[i].percent);
+            uint256 quoteAmount = quoteFund.div(quotes[i].price); 
+            quoteAmountMapping[quotes[i].symbol] = quoteAmount;
+            totalQuotesCount = totalQuotesCount.add(quoteAmount);
+        }
+        
+        //notify system to convert tokens to cash 
+        //and redestribute between traders to get started. 
+        StartTrading();
+    }
+    
+    /**
+     * Stops trading. Calculate profit after trading,
+     * redestribute profit between traders.
+     */
+    function stopTrading() public {
+        require(
+            start > 0,
+            "Trading is not started");
+        start = 0;//reset start
+        uint256 fund = investToken.balanceOf(this);
+        uint256 fundAfterTrading = fund.add(100);
+        uint256 profit = fundAfterTrading.add(fund); 
+        uint256 payout = fund.div(traders.length);
+        
+        // redestribute equivalent of profit in tokens among traders
+        for(uint i = 0; i < traders.length; ++i) {
+            Trader trader = traders[i];
+            if(tradersMapping[address(trader)]) {
+                investToken.transfer(address(trader), payout);
+            }
+        }
     }
     
     /**
@@ -115,19 +167,26 @@ contract Fond is BasicToken, Ownable {
      * number of active trades is not zero
      */
     function isAlive() public view returns (bool) {
-        return tradersCount > 0;
+        return traders.length > 0;
     }
     
     /**
      * Checks if fond is running or not.
      */
     function isRunning() public view returns(bool) {
-        return now - startTime < TRADING_PERIOD;
+        return now - start < DURATION;
+    }
+    
+    function getQuotes(string symbol) public view returns (uint256) {
+        require(
+            quotesPortfolion[symbol],
+            "There is not such qoute in portfolio");
+        return quoteAmountMapping[symbol];
     }
     
     function getName(address _trader) public view returns (string) {
         require(
-                traders[_trader],
+                tradersMapping[_trader],
                 "Such trader doesn't exist");
         return Trader(_trader).name();
     }
