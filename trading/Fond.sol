@@ -4,23 +4,86 @@ import "./tokens/Ownable.sol";
 import "./tokens/BasicToken.sol";
 import "./Trader.sol";
 
+/**
+ * Represents a fond that trader can found
+ * for fund-rising. Denotes a quotes portfolio
+ * that trader undertakes to buy.
+ * 
+ */
 contract Fond is BasicToken, Ownable {
     
-    uint256 public constant TRADING_PERIOD = 1000000;
-    uint8 public tradersCount;
-    
-    uint256 startTime;
-    mapping(address => bool) traders;
-    
+    /**
+     * Quote parameters.
+     */
     struct Quote {
         string symbol;
         uint256 price;
+        uint256 percent;
     }
     
-    constructor(string _symbol, uint256 price) {
-        require(_symbol != '', "Symbol is required");
-        require(_price > 0, 'Price is required');
+    /**
+     * Time period for trading. During that period
+     * fond blocks any fund operations.
+     */
+    uint256 public constant TRADING_PERIOD = 1000000;
+    /**
+     * Number of traders in fond
+     */
+    uint8 public tradersCount;
+    
+    /**
+     * Time when fond started trading.
+     */
+    uint256 startTime;
+    
+    /**
+     * Total tokens already fund rised.
+     */
+    uint256 public fundRisedTokensAmount;
+    
+    /**
+     * Total quotes count to buy
+     */
+    uint256 public desiredQuotesCount;
+    
+    /**
+     * Mapping of traders, used to check if such trader is already in fond. 
+     */
+    mapping(address => bool) traders;
+    
+    /**
+     * Mapping to check if such quote symbol already present in portfolio.
+     */
+    mapping(string => bool) quotesPortfolion;
+    /**
+     * Mapping of quote symbol to quote parameters, used for trading.
+     */
+    mapping(string => Quote) quotes;
+    
+    constructor(string _symbol, uint256 _count) {
         addTrader(msg.sender);
+        addQuote(_symbol, _count);
+    }
+    
+    /**
+     * Adds a new quote to fond. Not allow add the same quote several times. 
+     */
+    function addQuote(string _symbol, uint256 _percent) {
+        require(
+            bytes(_symbol).length != 0, 
+            "Symbol is required");
+        require(
+            _percent > 0, 
+            "Quote percent part should be greater");
+        require(
+            !quotesPortfolion[_symbol], 
+            "Such quote already in portfolio");
+        quotesPortfolion[_symbol] = true;
+        quotes[_symbol] = Quote({
+            symbol: _symbol,
+            percent: _percent,
+            price: 0
+        });
     }
     
     function addTrader(address _trader) onlyOwner public {
@@ -43,6 +106,7 @@ contract Fond is BasicToken, Ownable {
             !isRunning(), 
             "Fond already is running");
         startTime = now;
+        
     }
     
     /**

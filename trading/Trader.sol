@@ -31,11 +31,11 @@ contract Trader is BasicToken, Ownable {
     /**
      * Founds a new fond. Allows to have only one fond at time.
      */
-    function foundFond() public {
+    function foundFond(string _symbol, uint256 _percent) public {
         require(
             fond == address(0x0) || !fond.isAlive(),
             "You can manage only one fond at time");
-        fond = new Fond();
+        fond = new Fond(_symbol, _percent);
     }
 
     /**
