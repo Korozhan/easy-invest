@@ -12,10 +12,21 @@ contract Investor is BasicToken, Ownable {
     address public investor;
     string public name;
 
-    InvestToken public token;
+    /**
+     * Global smart contract that release a new tokens
+     * and keep token balans for actors in the system,
+     */
+    InvestToken public investToken;
 
-    function Investor() {
-        token = new InvestToken();
+    function Investor(address _investToken, string _name) public {
+        require(
+            _investToken != address(0),
+            "Invest token address is required");
+        require(
+            bytes(_name).length != 0,
+            "Trader is required");
+        investToken = InvestToken(_investToken);
+        name = _name;
     }
     
 //   function Investor(address _investor, string _name) public {
@@ -29,7 +40,7 @@ contract Investor is BasicToken, Ownable {
         require(_tokens != 0);
 
         if (_tokens > 0) {
-            token.invest(_fond, _tokens);
+            investToken.invest(_fond, _tokens);
         }
         return true;
     }
