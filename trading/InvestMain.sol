@@ -39,10 +39,7 @@ contract InvestMain is Ownable {
         require(investorId[targetInvestor] == 0);
 
         investorId[targetInvestor] = investors.length;
-        Investor investor = new Investor({investor : targetInvestor,
-            investorSince : now,
-            name : investorName});
-        investors.push(investor);
+        investors.push(new Investor(targetInvestor, now, investorName));
 
         MembershipChanged(targetInvestor, true);
     }
@@ -54,9 +51,9 @@ contract InvestMain is Ownable {
         uint256 lastId = investors.length - 1;
 
         // Move last member to removed position
-        Investor memory moved = investors[lastId];
+        Investor moved = investors[lastId];
         investors[targetId] = moved;
-        investorId[moved.investor] = targetId;
+        investorId[moved] = targetId;
 
         // Clean up
         investorId[targetInvestor] = 0;
@@ -66,7 +63,7 @@ contract InvestMain is Ownable {
         MembershipChanged(targetInvestor, false);
     }
 
-    function addFunds(address targetInvestor, uint256 amount) {
+    function addFunds(address targetInvestor, uint256 amount) returns (bool) {
         require(investorId[targetInvestor] != 0);
         uint256 tokens = amount.mul(rate);
         token.mint(owner, tokens);
@@ -78,10 +75,7 @@ contract InvestMain is Ownable {
         require(traderId[targetTrader] == 0);
 
         traderId[targetTrader] = traders.length;
-        Trader trader = new Trader({trader : targetTrader,
-            traderSince : now,
-            name : traderName});
-        traders.push(trader);
+        traders.push(new Trader(targetTrader, now, traderName));
 
 
         MembershipChanged(targetTrader, true);
@@ -94,9 +88,9 @@ contract InvestMain is Ownable {
         uint256 lastId = traders.length - 1;
 
         // Move last member to removed position
-        Trader memory moved = traders[lastId];
+        Trader moved = traders[lastId];
         traders[targetId] = moved;
-        traderId[moved.trader] = targetId;
+        traderId[moved] = targetId;
 
         // Clean up
         traderId[targetTrader] = 0;
@@ -104,38 +98,6 @@ contract InvestMain is Ownable {
         --traders.length;
 
         MembershipChanged(targetTrader, false);
-    }
-
-    function addFond(address targetFond, string fondName) public onlyOwner {
-        require(fondId[targetFond] == 0);
-
-        traderId[targetFond] = fonds.length;
-        Fond fond = new Fond({fond : targetFond,
-            fondSince : now,
-            name : fondName});
-        fonds.push(fond);
-
-
-        MembershipChanged(targetFond, true);
-    }
-
-    function removeTrader(address targetFond) public onlyOwner {
-        require(fondId[targetFond] != 0);
-
-        uint256 targetId = fondId[targetTrader];
-        uint256 lastId = fonds.length - 1;
-
-        // Move last member to removed position
-        Fond memory moved = fonds[lastId];
-        fonds[targetId] = moved;
-        fondId[moved.fond] = targetId;
-
-        // Clean up
-        fondId[targetFond] = 0;
-        delete fonds[lastId];
-        --fonds.length;
-
-        MembershipChanged(targetFond, false);
     }
 
     // set new dates for pre-salev (emergency case)

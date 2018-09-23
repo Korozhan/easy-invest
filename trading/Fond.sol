@@ -1,5 +1,6 @@
 pragma solidity ^0.4.15;
 
+import "../common/SafeMath.sol";
 import "./tokens/Ownable.sol";
 import "./tokens/BasicToken.sol";
 import "./tokens/InvestToken.sol";
@@ -45,6 +46,7 @@ contract Fond is Ownable {
      * Mapping of traders, used to check if such trader is already in fond. 
      */
     mapping(address => bool) tradersMapping;
+
     Trader[] traders;
     /**
      * Mapping to check if such quote symbol already present in portfolio.
@@ -54,26 +56,26 @@ contract Fond is Ownable {
      * Mapping of quote symbol to quote parameters, used for trading.
      */
     mapping(string => Quote) quotesMapping;
-    
+
     /**
      * Quotes to be interate thru.
      */
     Quote[] quotes;
-    
+
     /**
      * Mapping quote to amount.
      */
     mapping(string => uint256) quoteAmountMapping;
-    
+
     /**
      * Controls tokens emission. Allow transfering
      * and distributing tokens accross traders.
      */
     InvestToken investToken;
-    
+
     event StartTrading();
     event StopTrading();
-    
+
     constructor(address _investToken) {
         require(
             _investToken != address(0),
@@ -124,21 +126,21 @@ contract Fond is Ownable {
             !isRunning(),
             "Fond already is running");
         start = now; // start tranding
-        
+
         fundRisedTokensAmount = investToken.balanceOf(this);
         uint256 tokensPerPercent = fundRisedTokensAmount.div(100);
         for (uint i = 0; i < quotes.length; ++i) {
             uint256 quoteFund = tokensPerPercent.mul(quotes[i].percent);
-            uint256 quoteAmount = quoteFund.div(quotes[i].price); 
+            uint256 quoteAmount = quoteFund.div(quotes[i].price);
             quoteAmountMapping[quotes[i].symbol] = quoteAmount;
             totalQuotesCount = totalQuotesCount.add(quoteAmount);
         }
         
-        //notify system to convert tokens to cash 
-        //and redestribute between traders to get started. 
+        //notify system to convert tokens to cash
+        //and redestribute between traders to get started.
         StartTrading();
     }
-    
+
     /**
      * Stops trading. Calculate profit after trading,
      * redestribute profit between traders.
@@ -150,9 +152,9 @@ contract Fond is Ownable {
         start = 0;//reset start
         uint256 fund = investToken.balanceOf(this);
         uint256 fundAfterTrading = fund.add(100);
-        uint256 profit = fundAfterTrading.add(fund); 
+        uint256 profit = fundAfterTrading.add(fund);
         uint256 payout = fund.div(traders.length);
-        
+
         // redestribute equivalent of profit in tokens among traders
         for(uint i = 0; i < traders.length; ++i) {
             Trader trader = traders[i];
@@ -176,7 +178,7 @@ contract Fond is Ownable {
     function isRunning() public view returns(bool) {
         return now - start < DURATION;
     }
-    
+
     function getQuotes(string symbol) public view returns (uint256) {
         require(
             quotesPortfolion[symbol],

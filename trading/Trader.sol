@@ -26,10 +26,10 @@ contract Trader is Ownable {
     
     /**
      * Global smart contract that release a new tokens
-     * and keep token balans for actors in the system, 
+     * and keep token balans for actors in the system,
      */
     InvestToken public investToken;
-    
+
     /**
      * Create a new Trader with a given name
      */
