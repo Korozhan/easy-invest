@@ -11,7 +11,9 @@ import "./Trader.sol";
  * 
  */
 contract Fond is BasicToken, Ownable {
-    
+
+    using SafeMath for uint256;
+
     /**
      * Quote parameters.
      */
@@ -60,9 +62,8 @@ contract Fond is BasicToken, Ownable {
      */
     mapping(string => Quote) quotes;
     
-    constructor(string _symbol, uint256 _count) {
+    constructor() {
         addTrader(msg.sender);
-        addQuote(_symbol, _count);
     }
     
     /**

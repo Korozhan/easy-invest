@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.15;
 
 import "./common/SafeMath.sol";
 import "./tokens/Ownable.sol";
@@ -11,17 +11,13 @@ contract InvestMain is Ownable {
     using SafeMath for uint256;
 
     Investor[] public investors;
-
-    mapping(address => uint256) public investorId;
-
     Trader[] public traders;
-
-    mapping(address => uint256) public traderId;
-
     Fond[] public fonds;
 
+    mapping(address => uint256) public investorId;
+    mapping(address => uint256) public traderId;
     mapping(address => uint256) public fondId;
-
+    // mintable token
     InvestToken public token;
     // amount of raised money in platform token
     uint256 public raised;
@@ -47,7 +43,6 @@ contract InvestMain is Ownable {
             investorSince : now,
             name : investorName});
         investors.push(investor);
-
 
         MembershipChanged(targetInvestor, true);
     }

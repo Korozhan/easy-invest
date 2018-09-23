@@ -14,11 +14,13 @@ contract Trader is BasicToken, Ownable {
 
     using SafeMath for uint256;
 
+    address public trader;
     /**
      * Trader's name
      */
     string public name;
-    
+    uint256 public traderSince;
+
     Fond public fond; 
     
     /**
@@ -28,14 +30,18 @@ contract Trader is BasicToken, Ownable {
         name = _name;
     }
 
+    constructor(string _name) public {
+        name = _name;
+    }
+
     /**
      * Founds a new fond. Allows to have only one fond at time.
      */
-    function foundFond(string _symbol, uint256 _percent) public {
+    function foundFond() public {
         require(
             fond == address(0x0) || !fond.isAlive(),
             "You can manage only one fond at time");
-        fond = new Fond(_symbol, _percent);
+        fond = new Fond();
     }
 
     /**

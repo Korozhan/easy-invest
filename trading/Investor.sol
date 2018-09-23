@@ -1,10 +1,10 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.15;
 
 import "./common/SafeMath.sol";
 import "./tokens/Ownable.sol";
 import "./tokens/InvestToken.sol";
 
-contract Investor is Ownable {
+contract Investor is BasicToken, Ownable {
 
     using SafeMath for uint256;
 
@@ -14,13 +14,17 @@ contract Investor is Ownable {
 
     InvestToken public token;
 
-    function Investor(){
+    constructor() {
         token = new InvestToken();
     }
 
     // fallback function can be used to buy tokens
     function() payable {
         transfer(msg.sender);
+    }
+
+    function investTokens(address _fond, uint256 ) {
+        
     }
 
     // low level token purchase function
@@ -32,6 +36,5 @@ contract Investor is Ownable {
         if (amount > 0) {
             token.invest(fond, amount);
         }
-
     }
 }

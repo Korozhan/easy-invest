@@ -1,6 +1,6 @@
 pragma solidity ^0.4.0;
 
-import "./common/SafeMath.sol";
+import "../common/SafeMath.sol";
 import "./MintableToken.sol";
 
 contract InvestToken is MintableToken {
