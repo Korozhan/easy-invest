@@ -10,6 +10,7 @@ contract InvestToken is MintableToken {
     string public constant name = "Invest Token";
     string public constant symbol = "EasyInvest";
     uint8 public constant decimals = 18;
+
     mapping(address => uint8) investors;
     mapping(address => uint8) traders;
     mapping(address => uint8) fonds;

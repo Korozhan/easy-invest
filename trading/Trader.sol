@@ -23,14 +23,16 @@ contract Trader is BasicToken, Ownable {
 
     Fond public fond; 
     
-    /**
-     * Create a new Trader with a given name
-     */
-    constructor(string _name) public {
-        name = _name;
-    }
+    // /**
+    //  * Create a new Trader with a given name
+    //  */
+    // constructor(string _name) public {
+    //     name = _name;
+    // }
 
-    constructor(string _name) public {
+    constructor(address _trader, uint256 _traderSince, string _name) public {
+        trader = _trader;
+        traderSince = _traderSince;
         name = _name;
     }
 
@@ -60,5 +62,14 @@ contract Trader is BasicToken, Ownable {
             "Fond should be active to start trading");
         fond.startTrading();
     }
+    
+    // // fallback function after getting tokens back
+    // function() payable {
+    //     refund(msg.sender);
+    // }
+    
+    // function refund(address _investor) {
+        
+    // }
     
 }

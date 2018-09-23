@@ -1,5 +1,6 @@
 pragma solidity ^0.4.15;
 
+import "./common/SafeMath.sol";
 import "./tokens/Ownable.sol";
 import "./tokens/BasicToken.sol";
 import "./Trader.sol";
@@ -13,6 +14,11 @@ import "./Trader.sol";
 contract Fond is BasicToken, Ownable {
 
     using SafeMath for uint256;
+
+    address public fond;
+    uint256 public fondSince;
+    string public name;
+
 
     /**
      * Quote parameters.
@@ -61,10 +67,16 @@ contract Fond is BasicToken, Ownable {
      * Mapping of quote symbol to quote parameters, used for trading.
      */
     mapping(string => Quote) quotes;
-    
-    constructor() {
+
+    function Fond() {
         addTrader(msg.sender);
     }
+    
+    // function Fond(address _fond, uint256 _fondSince, string _name) public {
+    //     fond = _fond;
+    //     fondSince = _fondSince;
+    //     name = _name;
+    // }
     
     /**
      * Adds a new quote to fond. Not allow add the same quote several times. 
