@@ -6,7 +6,7 @@ import "./Trader.sol";
 
 contract Fond is BasicToken, Ownable {
     
-    uint256 public constant TRANDING_PERIOD = 1000000;
+    uint256 public constant TRADING_PERIOD = 1000000;
     uint8 public tradersCount;
     
     uint256 startTime;
@@ -50,7 +50,7 @@ contract Fond is BasicToken, Ownable {
      * Checks if fond is running or not.
      */
     function isRunning() public view returns(bool) {
-        return now - startTime < TRANDING_PERIOD;
+        return now - startTime < TRADING_PERIOD;
     }
     
     function getName(address _trader) public view returns (string) {
