@@ -70,5 +70,5 @@ contract Trader is Ownable {
             "Fond should be active to start trading");
         fond.startTrading();
     }
-    
+
 }

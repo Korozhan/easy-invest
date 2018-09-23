@@ -11,28 +11,26 @@ contract Investor is BasicToken, Ownable {
 
     address public investor;
     string public name;
-    uint256 public investorSince;
 
     InvestToken public token;
 
-    // function Investor() {
-    //     token = new InvestToken();
-    // }
-    
-   function Investor(address _investor, uint256 _investorSince, string _name) public {
-        investor = _investor;
-        investorSince = _investorSince;
-        name = _name;
+    function Investor() {
+        token = new InvestToken();
     }
+    
+//   function Investor(address _investor, string _name) public {
+//         investor = _investor;
+//         name = _name;
+//     }
 
     // low level token purchase function
-    function transfer(address fond) payable {
-        require(fond != 0x0);
-        require(msg.value != 0);
-        uint256 amount = msg.value;
+    function transfer(address _fond, uint256 _tokens) public returns(bool) {
+        require(_fond != 0x0);
+        require(_tokens != 0);
 
-        if (amount > 0) {
-            token.invest(fond, amount);
+        if (_tokens > 0) {
+            token.invest(_fond, _tokens);
         }
+        return true;
     }
 }

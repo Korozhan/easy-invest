@@ -35,70 +35,79 @@ contract InvestMain is Ownable {
         rate = 1;
     }
 
-    function addInvestor(address targetInvestor, string investorName) public onlyOwner {
-        require(investorId[targetInvestor] == 0);
+    // /**
+    //  * Will use after creating logic main app.
+    //  */
+    // function addInvestor(address targetInvestor, string investorName) public onlyOwner {
+    //     require(investorId[targetInvestor] == 0);
 
-        investorId[targetInvestor] = investors.length;
-        investors.push(new Investor(targetInvestor, now, investorName));
+    //     investorId[targetInvestor] = investors.length;
+    //     investors.push(new Investor(targetInvestor, investorName));
 
-        MembershipChanged(targetInvestor, true);
-    }
+    //     MembershipChanged(targetInvestor, true);
+    // }
 
-    function removeInvestor(address targetInvestor) public onlyOwner {
-        require(investorId[targetInvestor] != 0);
+    // function removeInvestor(address targetInvestor) public onlyOwner {
+    //     require(investorId[targetInvestor] != 0);
 
-        uint256 targetId = investorId[targetInvestor];
-        uint256 lastId = investors.length - 1;
+    //     uint256 targetId = investorId[targetInvestor];
+    //     uint256 lastId = investors.length - 1;
 
-        // Move last member to removed position
-        Investor moved = investors[lastId];
-        investors[targetId] = moved;
-        investorId[moved] = targetId;
+    //     // Move last member to removed position
+    //     Investor moved = investors[lastId];
+    //     investors[targetId] = moved;
+    //     investorId[moved] = targetId;
 
-        // Clean up
-        investorId[targetInvestor] = 0;
-        delete investors[lastId];
-        --investors.length;
+    //     // Clean up
+    //     investorId[targetInvestor] = 0;
+    //     delete investors[lastId];
+    //     --investors.length;
 
-        MembershipChanged(targetInvestor, false);
-    }
+    //     MembershipChanged(targetInvestor, false);
+    // }
 
     function addFunds(address targetInvestor, uint256 amount) returns (bool) {
-        require(investorId[targetInvestor] != 0);
+        // require(investorId[targetInvestor] != 0);
         uint256 tokens = amount.mul(rate);
-        token.mint(owner, tokens);
+        token.mint(targetInvestor, tokens);
         raised = raised.add(amount);
         return true;
     }
+    
+    // /**
+    //  * Will use after creating logic main app.
+    //  */
+    // function addTrader(address targetTrader, string traderName) public onlyOwner {
+    //     require(traderId[targetTrader] == 0);
 
-    function addTrader(address targetTrader, string traderName) public onlyOwner {
-        require(traderId[targetTrader] == 0);
-
-        traderId[targetTrader] = traders.length;
-        traders.push(new Trader(targetTrader, now, traderName));
+    //     traderId[targetTrader] = traders.length;
+    //     traders.push(new Trader(traderName));
 
 
-        MembershipChanged(targetTrader, true);
-    }
+    //     MembershipChanged(targetTrader, true);
+    // }
+    
+    // /**
+    //  * Will use after creating logic main app.
+    //  */
+    // function removeTrader(address targetTrader) public onlyOwner {
+    //     require(traderId[targetTrader] != 0);
 
-    function removeTrader(address targetTrader) public onlyOwner {
-        require(traderId[targetTrader] != 0);
+    //     uint256 targetId = traderId[targetTrader];
+    //     uint256 lastId = traders.length - 1;
 
-        uint256 targetId = traderId[targetTrader];
-        uint256 lastId = traders.length - 1;
+    //     // Move last member to removed position
+    //     Trader moved = traders[lastId];
+    //     traders[targetId] = moved;
+    //     traderId[moved] = targetId;
 
-        // Move last member to removed position
-        Trader moved = traders[lastId];
-        traders[targetId] = moved;
-        traderId[moved] = targetId;
+    //     // Clean up
+    //     traderId[targetTrader] = 0;
+    //     delete traders[lastId];
+    //     --traders.length;
 
-        // Clean up
-        traderId[targetTrader] = 0;
-        delete traders[lastId];
-        --traders.length;
-
-        MembershipChanged(targetTrader, false);
-    }
+    //     MembershipChanged(targetTrader, false);
+    // }
 
     // set new dates for pre-salev (emergency case)
     function setRate(uint256 _rate) public onlyOwner returns (bool) {

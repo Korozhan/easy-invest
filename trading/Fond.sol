@@ -3,7 +3,6 @@ pragma solidity ^0.4.15;
 import "./common/SafeMath.sol";
 import "./tokens/Ownable.sol";
 import "./tokens/BasicToken.sol";
-import "./tokens/InvestToken.sol";
 import "./Trader.sol";
 
 /**
@@ -15,6 +14,10 @@ import "./Trader.sol";
 contract Fond is Ownable {
 
     using SafeMath for uint256;
+
+    address public fond;
+    string public name;
+
 
     /**
      * Quote parameters.
@@ -83,7 +86,7 @@ contract Fond is Ownable {
         investToken = InvestToken(_investToken);
         addTrader(msg.sender);
     }
-    
+
     /**
      * Adds a new quote to fond. Not allow add the same quote several times. 
      */
@@ -136,32 +139,6 @@ contract Fond is Ownable {
             totalQuotesCount = totalQuotesCount.add(quoteAmount);
         }
         
-        //notify system to convert tokens to cash
-        //and redestribute between traders to get started.
-        StartTrading();
-    }
-
-    /**
-     * Stops trading. Calculate profit after trading,
-     * redestribute profit between traders.
-     */
-    function stopTrading() public {
-        require(
-            start > 0,
-            "Trading is not started");
-        start = 0;//reset start
-        uint256 fund = investToken.balanceOf(this);
-        uint256 fundAfterTrading = fund.add(100);
-        uint256 profit = fundAfterTrading.add(fund);
-        uint256 payout = fund.div(traders.length);
-
-        // redestribute equivalent of profit in tokens among traders
-        for(uint i = 0; i < traders.length; ++i) {
-            Trader trader = traders[i];
-            if(tradersMapping[address(trader)]) {
-                investToken.transfer(address(trader), payout);
-            }
-        }
     }
     
     /**

@@ -2,6 +2,10 @@ pragma solidity ^0.4.0;
 
 import "../common/SafeMath.sol";
 import "./MintableToken.sol";
+import "../Investor.sol";
+import "../Trader.sol";
+import "../Fond.sol";
+
 
 /**
  * Global smart contract that release a new tokens
@@ -15,9 +19,13 @@ contract InvestToken is MintableToken {
     string public constant symbol = "EasyInvest";
     uint8 public constant decimals = 18;
 
-    mapping(address => uint8) investors;
-    mapping(address => uint8) traders;
-    mapping(address => uint8) fonds;
+    Investor[] public investors;
+    Trader[] public traders;
+    Fond[] public fonds;
+    
+    mapping(address => uint8) investorsId;
+    mapping(address => uint8) tradersId;
+    mapping(address => uint8) fondsId;
 
     uint256 public rate;
     // true for finalised trading
@@ -29,9 +37,11 @@ contract InvestToken is MintableToken {
     }
 
     function invest(address _to, uint256 _value) public returns (bool) {
-        if (investors[msg.sender] != 0) {
+        if (investorsId[msg.sender] != 0) {
             require(!isFinalized);
-            require(fonds[_to] != 0);
+            require(fondsId[_to] != 0);
+            Fond fond = fonds[fondsId[_to]];
+            require(fond.isRunning());
             require(_value <= balances[msg.sender]);
             super.transfer(_to, _value);
             Transfer(msg.sender, _to, _value);
